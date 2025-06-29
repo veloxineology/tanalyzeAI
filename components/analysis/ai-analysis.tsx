@@ -655,7 +655,7 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge className={getCategoryColor(insight.category)}>
+                    <Badge variant="secondary">
                       <CategoryIcon className="h-3 w-3 mr-1" />
                       {insight.category}
                     </Badge>
