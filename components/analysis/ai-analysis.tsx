@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   Brain,
@@ -494,21 +493,6 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
     }
   }
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case "relationship":
-        return "bg-pink-500/20 text-pink-700"
-      case "individual":
-        return "bg-blue-500/20 text-blue-700"
-      case "compatibility":
-        return "bg-purple-500/20 text-purple-700"
-      case "growth":
-        return "bg-green-500/20 text-green-700"
-      default:
-        return "bg-gray-500/20 text-gray-700"
-    }
-  }
-
   const toggleExpand = (id: string) => {
     setExpandedInsights((prev) => ({
       ...prev,
@@ -634,8 +618,8 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
         </div>
 
         {state.insights.map((insight, index) => {
-          const IconComponent = insight.icon
-          const CategoryIcon = getCategoryIcon(insight.category)
+          const IconComponent = insight.icon || Brain // Fallback to Brain icon
+          const CategoryIcon = getCategoryIcon(insight.category) || Brain // Fallback to Brain icon
           const isExpanded = expandedInsights[insight.id] || false
 
           return (
@@ -647,7 +631,7 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-white/30 rounded-lg">
-                      <IconComponent className="h-5 w-5 text-purple-600" />
+                      {IconComponent && <IconComponent className="h-5 w-5 text-purple-600" />}
                     </div>
                     <div>
                       <CardTitle className="text-lg font-bold text-gray-800">{insight.title}</CardTitle>
@@ -656,7 +640,7 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-secondary text-secondary-foreground">
-                      <CategoryIcon className="h-3 w-3 mr-1" />
+                      {CategoryIcon && <CategoryIcon className="h-3 w-3 mr-1" />}
                       {insight.category}
                     </div>
                     <div className={`transform transition-transform ${isExpanded ? "rotate-180" : ""}`}>
