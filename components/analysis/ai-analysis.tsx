@@ -618,8 +618,6 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
         </div>
 
         {state.insights.map((insight, index) => {
-          const IconComponent = insight.icon || Brain // Fallback to Brain icon
-          const CategoryIcon = getCategoryIcon(insight.category) || Brain // Fallback to Brain icon
           const isExpanded = expandedInsights[insight.id] || false
 
           return (
@@ -631,7 +629,7 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-white/30 rounded-lg">
-                      {IconComponent && <IconComponent className="h-5 w-5 text-purple-600" />}
+                      <Brain className="h-5 w-5 text-purple-600" />
                     </div>
                     <div>
                       <CardTitle className="text-lg font-bold text-gray-800">{insight.title}</CardTitle>
@@ -640,7 +638,7 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-secondary text-secondary-foreground">
-                      {CategoryIcon && <CategoryIcon className="h-3 w-3 mr-1" />}
+                      <Brain className="h-3 w-3 mr-1" />
                       {insight.category}
                     </div>
                     <div className={`transform transition-transform ${isExpanded ? "rotate-180" : ""}`}>
