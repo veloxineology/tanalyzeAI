@@ -58,9 +58,12 @@ interface AIAnalysisState {
 }
 
 // Add these constants at the top
-const RATE_LIMIT_DELAY = 3000 // 3 seconds between requests for large datasets
+const RATE_LIMIT_DELAY = 5000 // 5 seconds between requests to be more conservative
 const LARGE_DATASET_THRESHOLD = 5000 // Consider dataset large if >5k messages
 const MAX_SAMPLE_MESSAGES = 300 // Reduce sample size for large datasets
+const MAX_DAILY_REQUESTS = 45 // Conservative limit to avoid hitting the 50/day quota
+const RETRY_DELAY = 35000 // 35 seconds for retry (based on the error message)
+const MAX_RETRIES = 3
 
 export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
   const [state, setState] = useState<AIAnalysisState>({
@@ -322,6 +325,39 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
     }
   }
 
+  // Get daily request count
+  const getDailyRequestCount = () => {
+    try {
+      const today = new Date().toDateString()
+      const stored = localStorage.getItem("gemini-daily-requests")
+      if (stored) {
+        const data = JSON.parse(stored)
+        if (data.date === today) {
+          return data.count
+        }
+      }
+      return 0
+    } catch (error) {
+      return 0
+    }
+  }
+
+  // Increment daily request count
+  const incrementDailyRequestCount = () => {
+    try {
+      const today = new Date().toDateString()
+      const currentCount = getDailyRequestCount()
+      const newCount = currentCount + 1
+      localStorage.setItem("gemini-daily-requests", JSON.stringify({
+        date: today,
+        count: newCount
+      }))
+      return newCount
+    } catch (error) {
+      return 0
+    }
+  }
+
   // Prepare chat data for analysis
   const prepareChatData = () => {
     try {
@@ -367,40 +403,67 @@ ${prompt}
 Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific and reference patterns you observe in the data. Focus on constructive insights that could help improve the relationship.
 `
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${state.apiKey}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
+    let retries = 0
+    while (retries <= MAX_RETRIES) {
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${state.apiKey}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              contents: [
                 {
-                  text: fullPrompt,
+                  parts: [
+                    {
+                      text: fullPrompt,
+                    },
+                  ],
                 },
               ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
+              generationConfig: {
+                temperature: 0.7,
+                topK: 40,
+                topP: 0.95,
+                maxOutputTokens: 1024,
+              },
+            }),
           },
-        }),
-      },
-    )
+        )
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`)
+        if (response.status === 429) {
+          // Rate limit hit
+          if (retries < MAX_RETRIES) {
+            console.log(`Rate limit hit, retrying in ${RETRY_DELAY / 1000} seconds...`)
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY))
+            retries++
+            continue
+          } else {
+            throw new Error("Rate limit exceeded. Please try again later or upgrade your API plan.")
+          }
+        }
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`)
+        }
+
+        const data = await response.json()
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated"
+      } catch (error) {
+        if (retries < MAX_RETRIES && error instanceof Error && error.message.includes("rate limit")) {
+          console.log(`Retrying API call (${retries + 1}/${MAX_RETRIES})...`)
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY))
+          retries++
+          continue
+        }
+        throw error
+      }
     }
-
-    const data = await response.json()
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated"
+    
+    throw new Error("Max retries exceeded")
   }
 
   // Start analysis
@@ -410,12 +473,30 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
       return
     }
 
+    // Check daily quota
+    const dailyCount = getDailyRequestCount()
+    const remainingRequests = MAX_DAILY_REQUESTS - dailyCount
+    
+    if (remainingRequests <= 0) {
+      alert(`Daily API quota exceeded (${MAX_DAILY_REQUESTS} requests). Please try again tomorrow or upgrade your API plan.`)
+      return
+    }
+
+    if (remainingRequests < state.insights.length) {
+      const confirmed = confirm(
+        `You have ${remainingRequests} requests remaining today, but need ${state.insights.length} for full analysis. ` +
+        `Only the first ${remainingRequests} insights will be analyzed. Continue?`
+      )
+      if (!confirmed) return
+    }
+
     setState((prev) => ({ ...prev, isAnalyzing: true, isPaused: false, currentAnalyzing: 0 }))
 
     const chatData = prepareChatData()
     const updatedInsights = [...state.insights]
+    const maxInsightsToAnalyze = Math.min(remainingRequests, state.insights.length)
 
-    for (let i = 0; i < updatedInsights.length; i++) {
+    for (let i = 0; i < maxInsightsToAnalyze; i++) {
       // Check if paused
       if (state.isPaused) {
         setState((prev) => ({ ...prev, isAnalyzing: false, currentAnalyzing: -1 }))
@@ -431,12 +512,29 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
       try {
         const result = await callGeminiAPI(updatedInsights[i].prompt, chatData)
         updatedInsights[i] = { ...updatedInsights[i], result, status: "completed" }
+        
+        // Increment daily request count
+        const newCount = incrementDailyRequestCount()
+        console.log(`API request ${newCount}/${MAX_DAILY_REQUESTS} completed`)
+        
       } catch (error) {
         console.error(`Error analyzing ${updatedInsights[i].id}:`, error)
-        updatedInsights[i] = {
-          ...updatedInsights[i],
-          result: `Analysis failed: ${error instanceof Error ? error.message : "Unknown error"}. Please check your API key and try again.`,
-          status: "error",
+        const errorMessage = error instanceof Error ? error.message : "Unknown error"
+        
+        if (errorMessage.includes("quota") || errorMessage.includes("rate limit")) {
+          updatedInsights[i] = {
+            ...updatedInsights[i],
+            result: `Analysis stopped: ${errorMessage}. Please try again tomorrow or upgrade your API plan.`,
+            status: "error",
+          }
+          // Stop analysis if quota exceeded
+          break
+        } else {
+          updatedInsights[i] = {
+            ...updatedInsights[i],
+            result: `Analysis failed: ${errorMessage}. Please check your API key and try again.`,
+            status: "error",
+          }
         }
       }
 
@@ -445,7 +543,7 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
 
       // Dynamic delay based on dataset size
       const isLargeDataset = messages.length > LARGE_DATASET_THRESHOLD
-      const delay = isLargeDataset ? RATE_LIMIT_DELAY : 2000
+      const delay = isLargeDataset ? RATE_LIMIT_DELAY : 3000
 
       await new Promise((resolve) => setTimeout(resolve, delay))
     }
@@ -554,6 +652,30 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
               </AlertDescription>
             </Alert>
           )}
+
+          {/* Daily Quota Status */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-800">Daily API Quota</span>
+              </div>
+              <span className="text-sm text-blue-600">
+                {getDailyRequestCount()}/{MAX_DAILY_REQUESTS} requests used
+              </span>
+            </div>
+            <div className="mt-2">
+              <div className="w-full bg-blue-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(getDailyRequestCount() / MAX_DAILY_REQUESTS) * 100}%` }}
+                />
+              </div>
+              <p className="text-xs text-blue-600 mt-1">
+                {MAX_DAILY_REQUESTS - getDailyRequestCount()} requests remaining today
+              </p>
+            </div>
+          </div>
 
           {/* Progress & Controls */}
           {(state.isAnalyzing || completedCount > 0) && (
