@@ -85,7 +85,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Heart,
       category: "relationship",
       prompt:
-        "Analyze the overall relationship dynamics between these two people based on their chat messages. Focus on power balance, emotional connection, and interaction patterns.",
+        "Analyze the overall relationship dynamics between these two people based on their chat messages. Focus on power balance, emotional connection, and interaction patterns. Do not bad reviews. Keep it mostly positive.give ",
       status: "pending",
     },
     {
@@ -95,7 +95,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: MessageCircle,
       category: "relationship",
       prompt:
-        "Analyze their communication styles. How do they express emotions, handle disagreements, and maintain conversations? Are they direct or indirect communicators?",
+        "Analyze their communication styles. How do they express emotions, handle disagreements, and maintain conversations? Are they direct or indirect communicators?Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -105,7 +105,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Brain,
       category: "individual",
       prompt:
-        "Evaluate the emotional intelligence of both participants. How well do they understand and respond to emotions? Do they show empathy and emotional support?",
+        "Evaluate the emotional intelligence of both participants. How well do they understand and respond to emotions? Do they show empathy and emotional support?Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -115,7 +115,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Shield,
       category: "relationship",
       prompt:
-        "Analyze how they handle conflicts, disagreements, or tense moments. Do they resolve issues constructively or avoid confrontation?",
+        "Analyze how they handle conflicts, disagreements, or tense moments. Do they resolve issues constructively or avoid confrontation?Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -125,7 +125,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Users,
       category: "relationship",
       prompt:
-        "Assess the level of intimacy and emotional closeness. Do they share personal thoughts, vulnerabilities, and deep conversations?",
+        "Assess the level of intimacy and emotional closeness. Do they share personal thoughts, vulnerabilities, and deep conversations?Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -135,7 +135,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: CheckCircle,
       category: "relationship",
       prompt:
-        "Identify trust indicators in their conversations. Do they rely on each other, share secrets, and show consistency in their words and actions?",
+        "Identify trust indicators in their conversations. Do they rely on each other, share secrets, and show consistency in their words and actions?Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -145,7 +145,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Target,
       category: "compatibility",
       prompt:
-        "Evaluate their long-term compatibility. Do they share similar values, life goals, and visions for the future? Are they growing in the same direction?",
+        "Evaluate their long-term compatibility. Do they share similar values, life goals, and visions for the future? Are they growing in the same direction?Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -154,7 +154,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       description: "Individual strengths and positive qualities",
       icon: Star,
       category: "individual",
-      prompt: `Analyze ${analysisData.participants[0]}'s strengths based on their messages. What positive qualities, skills, and traits do they demonstrate?`,
+      prompt: `Analyze ${analysisData.participants[0]}'s strengths based on their messages. What positive qualities, skills, and traits do they demonstrate?Do not bad reviews. Keep it mostly positive.give`,
       status: "pending",
     },
     {
@@ -163,7 +163,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       description: "Areas for personal development and improvement",
       icon: TrendingUp,
       category: "individual",
-      prompt: `Identify areas where ${analysisData.participants[0]} could grow or improve based on their communication patterns and behaviors in the chat.`,
+      prompt: `Identify areas where ${analysisData.participants[0]} could grow or improve based on their communication patterns and behaviors in the chat.Do not bad reviews. Keep it mostly positive.give`,
       status: "pending",
     },
     {
@@ -172,7 +172,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       description: "Individual strengths and positive qualities",
       icon: Award,
       category: "individual",
-      prompt: `Analyze ${analysisData.participants[1] || "the other person"}'s strengths based on their messages. What positive qualities, skills, and traits do they demonstrate?`,
+      prompt: `Analyze ${analysisData.participants[1] || "the other person"}'s strengths based on their messages. What positive qualities, skills, and traits do they demonstrate?Do not bad reviews. Keep it mostly positive.give`,
       status: "pending",
     },
     {
@@ -181,7 +181,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       description: "Areas for personal development and improvement",
       icon: Lightbulb,
       category: "individual",
-      prompt: `Identify areas where ${analysisData.participants[1] || "the other person"} could grow or improve based on their communication patterns and behaviors in the chat.`,
+      prompt: `Identify areas where ${analysisData.participants[1] || "the other person"} could grow or improve based on their communication patterns and behaviors in the chat.Do not bad reviews. Keep it mostly positive.give`,
       status: "pending",
     },
     {
@@ -191,7 +191,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Sparkles,
       category: "compatibility",
       prompt:
-        "Identify shared interests, values, hobbies, and topics they both enjoy discussing. What brings them together?",
+        "Identify shared interests, values, hobbies, and topics they both enjoy discussing. What brings them together?Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -201,7 +201,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: TrendingUp,
       category: "growth",
       prompt:
-        "Assess the potential for their relationship to grow and deepen. Are they both invested in improvement and development?",
+        "Assess the potential for their relationship to grow and deepen. Are they both invested in improvement and development?Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -211,7 +211,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: AlertTriangle,
       category: "relationship",
       prompt:
-        "Identify any red flags, concerning patterns, or potential issues in their communication that might need attention.",
+        "Identify any red flags, concerning patterns, or potential issues in their communication that might need attention.Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -221,7 +221,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Heart,
       category: "relationship",
       prompt:
-        "Provide an overall relationship health assessment with a score out of 10 and explain the reasoning behind the score.",
+        "Provide an overall relationship health assessment with a score out of 10 and explain the reasoning behind the score.Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -231,7 +231,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Heart,
       category: "compatibility",
       prompt:
-        "Analyze their love languages based on how they express affection and care. Do they use words of affirmation, quality time, physical touch references, acts of service, or gifts?",
+        "Analyze their love languages based on how they express affection and care. Do they use words of affirmation, quality time, physical touch references, acts of service, or gifts? Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -241,7 +241,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Users,
       category: "individual",
       prompt:
-        "Identify their attachment styles (secure, anxious, avoidant, disorganized) based on how they connect and maintain relationships.",
+        "Identify their attachment styles (secure, anxious, avoidant, disorganized) based on how they connect and maintain relationships.Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -251,7 +251,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Clock,
       category: "relationship",
       prompt:
-        "Analyze their communication frequency patterns. Who initiates more? Are there patterns in response times and conversation flow?",
+        "Analyze their communication frequency patterns. Who initiates more? Are there patterns in response times and conversation flow?Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -261,7 +261,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Shield,
       category: "relationship",
       prompt:
-        "Evaluate the quality of emotional support they provide each other during difficult times, celebrations, and daily life.",
+        "Evaluate the quality of emotional support they provide each other during difficult times, celebrations, and daily life.Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
     {
@@ -271,7 +271,7 @@ export function AIAnalysis({ messages, analysisData }: AIAnalysisProps) {
       icon: Eye,
       category: "growth",
       prompt:
-        "Based on all their interactions, assess the long-term prospects of their relationship. What factors support or challenge their future together?",
+        "Based on all their interactions, assess the long-term prospects of their relationship. What factors support or challenge their future together?Do not bad reviews. Keep it mostly positive.give",
       status: "pending",
     },
   ]
