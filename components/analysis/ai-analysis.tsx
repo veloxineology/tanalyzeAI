@@ -655,10 +655,10 @@ Please provide a detailed, thoughtful analysis in 2-3 paragraphs. Be specific an
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">
+                    <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-secondary text-secondary-foreground">
                       <CategoryIcon className="h-3 w-3 mr-1" />
                       {insight.category}
-                    </Badge>
+                    </div>
                     <div className={`transform transition-transform ${isExpanded ? "rotate-180" : ""}`}>
                       <ChevronDown className="h-4 w-4 text-gray-500" />
                     </div>
